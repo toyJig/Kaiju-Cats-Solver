@@ -5,6 +5,7 @@ public class AIOptimizerV1 { // do random shit
 
     private Tile[][] map;
     private List<Tile> buildingTiles = new ArrayList<>();
+    private int money = 200;
 
     public AIOptimizerV1(Tile[][] map){
         this.map = map;
@@ -20,13 +21,34 @@ public class AIOptimizerV1 { // do random shit
 
     public void guessOptimization (){
         Tile tile = buildingTiles.get((int) (Math.random() * buildingTiles.size()));
-        if ((int) (Math.random() * 2) == 0){
-            tile.setCommandBottom(Command.POWERUP.getRandomCommand()); // sorta scuffed way to get random command bc it wont let me do it normally
-            // System.out.println("Into (bottom): " + tile.getCommandBottom().toString());
+
+
+        Command randoCommand = Command.POWERUP.getRandomCommand();
+
+        if ((int) (Math.random() * 2) == 0 && tile.getTileType() != TileType.POWER_PLANT){
+            if (money - randoCommand.getCost() + tile.getCommandBottom().getCost() >= 0){
+                money -= randoCommand.getCost() - tile.getCommandBottom().getCost();
+                tile.setCommandBottom(randoCommand); // sorta scuffed way to get random command bc it wont let me do it normally
+            }else{
+                money += tile.getCommandBottom().getCost();
+                tile.setCommandBottom(Command.NULL);
+            }
+            // System.out.println("Into (bottom): " + tile.getCommandBottom().toString() + " Money change:" + (randoCommand.getCost() - tile.getCommandBottom().getCost()) + " to " + money);
         }else{
-            tile.setCommandTop(Command.POWERUP.getRandomCommand());
-            // System.out.println("Into (top): " + tile.getCommandTop().toString());
+            if (money - randoCommand.getCost() + tile.getCommandTop().getCost() >= 0){
+                money -= randoCommand.getCost() - tile.getCommandTop().getCost();
+                tile.setCommandTop(randoCommand);
+            }else{
+                money += tile.getCommandTop().getCost();
+                tile.setCommandTop(Command.NULL);
+            }
+            // System.out.println("Into (top): " + tile.getCommandTop().toString() + " Money change:" + (randoCommand.getCost() - tile.getCommandTop().getCost()) + " to " + money);
         }
+        
+    }
+
+    public int getMoney() {
+        return money;
     }
     
 }

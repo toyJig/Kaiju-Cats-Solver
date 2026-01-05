@@ -37,7 +37,8 @@ enum Command {
     TURN_E(10),
     TURN_W(10),
     STOMP(20),
-    POWERUP(30);
+    POWERUP(30),
+    NULL(0);
 
     private final int cost;
 
@@ -55,7 +56,7 @@ enum Command {
         }
     }
     public Command getRandomCommand(){
-        int randomNum = (int) (Math.random()*6);
+        int randomNum = (int) (Math.random()*7);
         if (randomNum == 0){
             return TURN_N;
         }
@@ -74,6 +75,9 @@ enum Command {
         if (randomNum == 5){
             return POWERUP;
         }
+        if (randomNum == 6){
+            return NULL;
+        }
         return null;
     }
     @Override
@@ -85,6 +89,7 @@ enum Command {
             case TURN_W: return "TURN_W";
             case STOMP: return "STOMP";
             case POWERUP: return "POWERUP";
+            case NULL: return "null";
             default: return "null";
         }
     }

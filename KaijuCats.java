@@ -69,10 +69,11 @@ class KaijuCats{
         Tile[][] bestRun = new Tile[5][7];
         Simulator bestSimulator = new Simulator(null, null, null, map);
         int bestScore = 0;
+        int bestScoreMoney = 0;
         
         AIOptimizerV1 AI = new AIOptimizerV1(map);
 
-        for (int i = 0; i<1000000; i++){
+        for (int i = 0; bestScore>70000; i++){
             Tile[][] mapClone = new Tile[5][7];
             for (int row = 0; row < map.length; row++) {
                 for (int col = 0; col < map[row].length; col++) {
@@ -80,7 +81,7 @@ class KaijuCats{
                 }
             }
             
-            for (int j = 0; j<25; j++){AI.guessOptimization();}
+            for (int j = 0; j<10; j++){AI.guessOptimization();}
 
             Cat bCat = new Cat(CatColor.BLUE);
             Cat rCat = new Cat(CatColor.RED);
@@ -92,6 +93,7 @@ class KaijuCats{
                 bestScore = score;
                 bestRun = mapClone;
                 bestSimulator = simulator;
+                bestScoreMoney = AI.getMoney();
             }
         }
         System.out.println(bestSimulator);
@@ -102,6 +104,7 @@ class KaijuCats{
             System.out.println();
         }
         System.out.println("BEST: " + bestScore);
+        System.out.println("Money Left:" + bestScoreMoney);
         
     } 
 }

@@ -91,7 +91,8 @@ public class Simulator {
         string += "\n";
         for (Cat cat : cats){
             string += cat.getColor().toString() + ": \t(x:" + cat.getX() + " y: " + cat.getY() + ")\t Score:" + cat.getPower() + "\n";
-            score += cat.getPower();
+            if (cat.getStatus() == CatStatus.FINISHED)
+                score += cat.getPower();
         }
         string += "\nTotal Score: " + score;
         

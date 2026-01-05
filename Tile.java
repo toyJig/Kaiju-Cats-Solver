@@ -14,8 +14,8 @@ public class Tile {
     private TileType tileType;
     private CatColor color;
     private int stompsLeft;
-    private Command commandTop;
-    private Command commandBottom;
+    private Command commandTop = Command.NULL;
+    private Command commandBottom = Command.NULL;
     
     public Tile(TileType tileType){ this.tileType = tileType; }
     public Tile(TileType tileType, int stompsLeft){ this.tileType = tileType; this.stompsLeft = stompsLeft; }
@@ -55,7 +55,7 @@ public class Tile {
             }else if (commandTop == Command.STOMP){
                 cat.setStatus(CatStatus.STOMPING);
             }else if (commandTop == Command.POWERUP){
-                cat.increasePower(2000);
+                cat.increasePower(1000);
             }
         }else if (stompsLeft == 1 && commandBottom != null){
             if (commandBottom.getDirection() != null){
@@ -63,7 +63,7 @@ public class Tile {
             }else if (commandBottom == Command.STOMP){
                 cat.setStatus(CatStatus.STOMPING);
             }else if (commandBottom == Command.POWERUP){
-                cat.increasePower(2000);
+                cat.increasePower(1000);
             }
         }
 
