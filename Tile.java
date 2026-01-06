@@ -24,8 +24,10 @@ public class Tile {
         this.tileType = other.tileType;
         this.color = other.color;
         this.stompsLeft = other.stompsLeft;
-        this.commandTop = other.commandTop;
-        this.commandBottom = other.commandBottom;
+        if (other.commandTop != null)
+            this.commandTop = other.commandTop;
+        if (other.commandBottom != null)
+            this.commandBottom = other.commandBottom;
     }
 
     public TileType getTileType() {
@@ -43,6 +45,7 @@ public class Tile {
                 } else{
                     cat.increasePower(cat.getPower()*4);
                 }
+                simulator.increaseCatsFinished();
             }else{
                 cat.setDirection(cat.getDirection().getOppositeDirection());
                 cat.setX(cat.getX() + cat.getDirection().getDx());

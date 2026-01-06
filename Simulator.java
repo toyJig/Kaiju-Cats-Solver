@@ -31,10 +31,13 @@ public class Simulator {
             if (cat.getStatus() == CatStatus.ACTIVE) {
                 int targetX = cat.getX() + cat.getDirection().getDx();
                 int targetY = cat.getY() + cat.getDirection().getDy();
-                if (targetX >= 0 && targetX <= 6 && targetY >= 0 && targetY <= 4 && getTile(targetX, targetY).getTileType() != TileType.WALL){
-                    movements.add(new CatMovement(cat,targetX, targetY)); //dunno what this is for rn
-                    cat.setX(targetX);
-                    cat.setY(targetY);
+                if (targetX >= 0 && targetX <= 6 && targetY >= 0 && targetY <= 4){
+                    TileType targetTileType = getTile(targetX, targetY).getTileType();
+                    if (targetTileType != TileType.WALL && targetTileType != TileType.BOULDER){
+                        movements.add(new CatMovement(cat,targetX, targetY)); //dunno what this is for rn
+                        cat.setX(targetX);
+                        cat.setY(targetY);
+                    }
                 }else{
                     cat.setDirection(cat.getDirection().getOppositeDirection());
                 }
@@ -77,6 +80,7 @@ public class Simulator {
     public Tile getTile(int x, int y){ return map[y][x]; }
     public void increaseCatsFinished() { catsFinished+=1; }
     public int getCatsFinished() { return catsFinished; }
+    public List<Cat> getCats() { return cats; }
 
     @Override
     public String toString() { //print result formatting
@@ -90,7 +94,7 @@ public class Simulator {
         }
         string += "\n";
         for (Cat cat : cats){
-            string += cat.getColor().toString() + ": \t(x:" + cat.getX() + " y: " + cat.getY() + ")\t Score:" + cat.getPower() + "\n";
+            string += cat.getColor().toString() + ": \t(x:" + cat.getX() + " y: " + cat.getY() + ")\t Score:" + cat.getPower() + "\tStatus:" + cat.getStatus().toString() + "\t Direction:" + cat.getDirection().toString() + "\n";
             if (cat.getStatus() == CatStatus.FINISHED)
                 score += cat.getPower();
         }

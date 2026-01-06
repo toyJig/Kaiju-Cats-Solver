@@ -4,10 +4,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-
-
-class KaijuCats{
+class KaijuCats{ 
     public static void main (String[] args){
+        final int ATTEMPTS = 1000000;
+        final int whenToZoneIn = ATTEMPTS/3;
 
         //----------------------read input file and put it in map-----------------------------
         Tile[][] map = new Tile[5][7];
@@ -65,15 +65,24 @@ class KaijuCats{
         }
 
         //------------------------------set up simulation-------------------------------------
-        
-        Tile[][] bestRun = new Tile[5][7];
+        Tile[][] bestRunMap = new Tile[5][7];
         Simulator bestSimulator = new Simulator(null, null, null, map);
         int bestScore = 0;
-        int bestScoreMoney = 0;
-        
-        AIOptimizerV1 AI = new AIOptimizerV1(map);
+        int bestScoreMoney = 200;
 
-        for (int i = 0; bestScore>70000; i++){
+        Tile[][] bestRunMap2 = new Tile[5][7];
+        Simulator bestSimulator2 = new Simulator(null, null, null, map);
+        int bestScore2 = 0;
+        int bestScoreMoney2 = 200;
+
+        Tile[][] bestRunMap3 = new Tile[5][7];
+        Simulator bestSimulator3 = new Simulator(null, null, null, map);
+        int bestScore3 = 0;
+        int bestScoreMoney3 = 200;
+        
+        //------------------------------attempt optimizations---------------------------------
+        AIOptimizerV2 AI = new AIOptimizerV2(map, ATTEMPTS, whenToZoneIn, false);
+        for (int i = 0; i<whenToZoneIn; i++){
             Tile[][] mapClone = new Tile[5][7];
             for (int row = 0; row < map.length; row++) {
                 for (int col = 0; col < map[row].length; col++) {
@@ -81,23 +90,183 @@ class KaijuCats{
                 }
             }
             
-            for (int j = 0; j<10; j++){AI.guessOptimization();}
+            // for (int j = 0; j<10; j++){AI.guessOptimization();}
+            AI.guessOptimization();
 
             Cat bCat = new Cat(CatColor.BLUE);
             Cat rCat = new Cat(CatColor.RED);
-            Cat gCat = new Cat(CatColor.GREEN);            
+            Cat gCat = new Cat(CatColor.GREEN);    
 
             Simulator simulator = new Simulator(bCat, rCat, gCat, mapClone);
             int score = simulator.fullSimulationScore();
-            if (score>bestScore){
+            // System.out.println(simulator);
+            // System.out.println(score);
+
+            int distancePenalty = 0;
+            for (Cat cat : simulator.getCats()){
+                distancePenalty += 500 * (6 - cat.getX());
+                if (cat.getColor() == CatColor.BLUE)
+                    distancePenalty += 500 * Math.abs(1 - cat.getY());
+                if (cat.getColor() == CatColor.RED)
+                    distancePenalty += 500 * Math.abs(2 - cat.getY());
+                if (cat.getColor() == CatColor.GREEN)
+                    distancePenalty += 500 * Math.abs(3 - cat.getY());
+            }
+
+            if (score - distancePenalty > bestScore){
+                bestScore3 = bestScore2; // may cause weird stuff with memory
+                bestRunMap3 = bestRunMap2;
+                bestSimulator3 = bestSimulator2;
+                bestScoreMoney3 = bestScoreMoney2;
+
+                bestScore2 = bestScore;
+                bestRunMap2 = bestRunMap;
+                bestSimulator2 = bestSimulator;
+                bestScoreMoney2 = bestScoreMoney;
+
                 bestScore = score;
-                bestRun = mapClone;
+                bestRunMap = mapClone;
                 bestSimulator = simulator;
                 bestScoreMoney = AI.getMoney();
             }
         }
+        //refine best run 1
+        AIOptimizerV2 AI1 = new AIOptimizerV2(bestRunMap, ATTEMPTS, whenToZoneIn, true);
+        for (int i = 0; i<whenToZoneIn; i++){
+            Tile[][] mapClone = new Tile[5][7];
+            for (int row = 0; row < bestRunMap.length; row++) {
+                for (int col = 0; col < bestRunMap[row].length; col++) {
+                    mapClone[row][col] = new Tile(bestRunMap[row][col]); 
+                }
+            }
+            
+            AI1.guessOptimization();
+
+            Cat bCat = new Cat(CatColor.BLUE);
+            Cat rCat = new Cat(CatColor.RED);
+            Cat gCat = new Cat(CatColor.GREEN);    
+
+            Simulator simulator = new Simulator(bCat, rCat, gCat, mapClone);
+            int score = simulator.fullSimulationScore();
+            // System.out.println(simulator);
+            // System.out.println(score);
+
+            int distancePenalty = 0;
+            for (Cat cat : simulator.getCats()){
+                distancePenalty += 500 * (6 - cat.getX());
+                if (cat.getColor() == CatColor.BLUE)
+                    distancePenalty += 500 * Math.abs(1 - cat.getY());
+                if (cat.getColor() == CatColor.RED)
+                    distancePenalty += 500 * Math.abs(2 - cat.getY());
+                if (cat.getColor() == CatColor.GREEN)
+                    distancePenalty += 500 * Math.abs(3 - cat.getY());
+            }
+
+            if (score - distancePenalty > bestScore){
+                bestScore = score;
+                bestRunMap = mapClone;
+                bestSimulator = simulator;
+                bestScoreMoney = AI.getMoney();
+            }
+        }
+        //refine best run 2
+        AIOptimizerV2 AI2 = new AIOptimizerV2(bestRunMap2, ATTEMPTS, whenToZoneIn, true);
+        for (int i = 0; i<whenToZoneIn; i++){
+            Tile[][] mapClone = new Tile[5][7];
+            for (int row = 0; row < bestRunMap2.length; row++) {
+                for (int col = 0; col < bestRunMap2[row].length; col++) {
+                    mapClone[row][col] = new Tile(bestRunMap2[row][col]); 
+                }
+            }
+            
+            AI2.guessOptimization();
+
+            Cat bCat = new Cat(CatColor.BLUE);
+            Cat rCat = new Cat(CatColor.RED);
+            Cat gCat = new Cat(CatColor.GREEN);    
+
+            Simulator simulator = new Simulator(bCat, rCat, gCat, mapClone);
+            int score = simulator.fullSimulationScore();
+            // System.out.println(simulator);
+            // System.out.println(score);
+
+            int distancePenalty = 0;
+            for (Cat cat : simulator.getCats()){
+                distancePenalty += 500 * (6 - cat.getX());
+                if (cat.getColor() == CatColor.BLUE)
+                    distancePenalty += 500 * Math.abs(1 - cat.getY());
+                if (cat.getColor() == CatColor.RED)
+                    distancePenalty += 500 * Math.abs(2 - cat.getY());
+                if (cat.getColor() == CatColor.GREEN)
+                    distancePenalty += 500 * Math.abs(3 - cat.getY());
+            }
+
+            if (score - distancePenalty > bestScore){
+                bestScore2 = score;
+                bestRunMap2 = mapClone;
+                bestSimulator2 = simulator;
+                bestScoreMoney2 = AI.getMoney();
+            }
+        }
+        //refine best run 3
+        AIOptimizerV2 AI3 = new AIOptimizerV2(bestRunMap3, ATTEMPTS, whenToZoneIn, true);
+        for (int i = 0; i<whenToZoneIn; i++){
+            Tile[][] mapClone = new Tile[5][7];
+            for (int row = 0; row < bestRunMap3.length; row++) {
+                for (int col = 0; col < bestRunMap3[row].length; col++) {
+                    mapClone[row][col] = new Tile(bestRunMap3[row][col]); 
+                }
+            }
+
+            AI3.guessOptimization();
+
+            Cat bCat = new Cat(CatColor.BLUE);
+            Cat rCat = new Cat(CatColor.RED);
+            Cat gCat = new Cat(CatColor.GREEN);    
+
+            Simulator simulator = new Simulator(bCat, rCat, gCat, mapClone);
+            int score = simulator.fullSimulationScore();
+            // System.out.println(simulator);
+            // System.out.println(score);
+
+            int distancePenalty = 0;
+            for (Cat cat : simulator.getCats()){
+                distancePenalty += 500 * (6 - cat.getX());
+                if (cat.getColor() == CatColor.BLUE)
+                    distancePenalty += 500 * Math.abs(1 - cat.getY());
+                if (cat.getColor() == CatColor.RED)
+                    distancePenalty += 500 * Math.abs(2 - cat.getY());
+                if (cat.getColor() == CatColor.GREEN)
+                    distancePenalty += 500 * Math.abs(3 - cat.getY());
+            }
+
+            if (score - distancePenalty > bestScore){
+                bestScore3 = score;
+                bestRunMap3 = mapClone;
+                bestSimulator3 = simulator;
+                bestScoreMoney3 = AI.getMoney();
+            }
+        }
+        //------------------------------output best run----------------------------------------
+        int bestOverallScore = Math.max(bestScore, Math.max(bestScore2, bestScore3));
+        if (bestOverallScore == bestScore2){
+            bestScore = bestScore2;
+            bestRunMap = bestRunMap2;
+            bestSimulator = bestSimulator2;
+            bestScoreMoney = bestScoreMoney2;
+        } else if (bestOverallScore == bestScore3){
+            bestScore = bestScore3;
+            bestRunMap = bestRunMap3;
+            bestSimulator = bestSimulator3;
+            bestScoreMoney = bestScoreMoney3;
+        }
+
+        if (bestScore <= 0){
+            System.out.println("Not possible to optimize :(");
+            return;
+        }
         System.out.println(bestSimulator);
-        for (Tile[] tiles : bestRun){
+        for (Tile[] tiles : bestRunMap){
             for (Tile tile : tiles){
                 System.out.print((tile.getCommandTop()!=null ? tile.getCommandTop().toString() : "null") + "," + (tile.getCommandBottom()!=null ? tile.getCommandBottom().toString() : "null") + "\t");
             }
