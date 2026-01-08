@@ -80,6 +80,28 @@ enum Command {
         }
         return null;
     }
+    public Command getRandomCommandNoNULL(){
+        int randomNum = (int) (Math.random()*6);
+        if (randomNum == 0){
+            return TURN_N;
+        }
+        if (randomNum == 1){
+            return TURN_S;
+        }
+        if (randomNum == 2){
+            return TURN_E;
+        }
+        if (randomNum == 3){
+            return TURN_W;
+        }
+        if (randomNum == 4){
+            return STOMP;
+        }
+        if (randomNum == 5){
+            return POWERUP;
+        }
+        return null;
+    }
     @Override
     public String toString() {
         switch (this){

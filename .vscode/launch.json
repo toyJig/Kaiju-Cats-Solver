@@ -9,6 +9,13 @@
             "name": "KaijuCats",
             "request": "launch",
             "mainClass": "KaijuCats",
+            "projectName": "Kaiju-Cats_329f3733"
+        },
+        {
+            "type": "java",
+            "name": "KaijuCats",
+            "request": "launch",
+            "mainClass": "KaijuCats",
             "projectName": "Kaiju Cats_370bf5e7"
         },
         {

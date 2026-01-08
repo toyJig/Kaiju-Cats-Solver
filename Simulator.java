@@ -8,18 +8,16 @@ public class Simulator {
     private List<CatMovement> movements;
     private List<Cat> cats = new ArrayList<>();
     private int catsFinished = 0;
+    private int money;
     
     private Tile[][] map;
-    private String[][] output = new String[5][7];
     
-    public Simulator (Cat bCat, Cat rCat, Cat gCat, Tile[][] map){
+    public Simulator (Cat bCat, Cat rCat, Cat gCat, Tile[][] map, int money){
         cats.add(bCat);
         cats.add(rCat);
         cats.add(gCat); 
         this.map = map;
-        for (String[] row : output) {
-            Arrays.fill(row, "..");
-        }
+        this.money = money;
     }
 
     public void simulateTurn(){
@@ -66,10 +64,21 @@ public class Simulator {
         }
     }
 
-    public int fullSimulationScore(){
+    public void fullSimulation(){
         for (int i = 0; i < 15; i++){
             simulateTurn();
         }
+    }
+
+    public int getAIScore(){
+        int score = 0;
+        for (Cat cat : cats){
+            score += cat.getPower();
+        }
+        return score;
+    }
+
+    public int getScore() {
         int score = 0;
         for (Cat cat : cats){
             if (cat.getStatus() == CatStatus.FINISHED)
@@ -81,11 +90,15 @@ public class Simulator {
     public void increaseCatsFinished() { catsFinished+=1; }
     public int getCatsFinished() { return catsFinished; }
     public List<Cat> getCats() { return cats; }
+    public int getMoney(){ return money; }
+    public void addMoney(int amount){ money += amount; }
+    public Tile[][] getMap() { return map; }
 
     @Override
     public String toString() { //print result formatting
         String string = "";
         int score = 0;
+        int AIScore = 0;
         for (Tile[] tileRow : map){
             for (Tile tile : tileRow){
                 string += tile.toString() + "\t";
@@ -97,9 +110,10 @@ public class Simulator {
             string += cat.getColor().toString() + ": \t(x:" + cat.getX() + " y: " + cat.getY() + ")\t Score:" + cat.getPower() + "\tStatus:" + cat.getStatus().toString() + "\t Direction:" + cat.getDirection().toString() + "\n";
             if (cat.getStatus() == CatStatus.FINISHED)
                 score += cat.getPower();
+            AIScore += cat.getPower();
         }
         string += "\nTotal Score: " + score;
-        
+        string += "\nAI Score: " + AIScore;
         return string;
     }
 }
