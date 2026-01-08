@@ -113,7 +113,7 @@ public class Simulator {
             AIScore += cat.getPower();
         }
         string += "\nTotal Score: " + score;
-        string += "\nAI Score: " + AIScore;
+        // string += "\nAI Score: " + AIScore;
         return string;
     }
 }

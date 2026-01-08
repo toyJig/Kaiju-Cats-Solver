@@ -9,8 +9,12 @@ public class AIOptimizerV3 { //weighted random shit - Features: heat based accep
     private int zoneInAttempts;
     private int attempts = 0;
     
-    public double heat = 100000;
     public int allowedAttempts;
+    
+    //AI Weight Settings
+    public double heat = 100000;
+    private int distancePenaltyMod = 500;
+    private int catsFinishedPenaltyMod = 2000;
 
     // Best run tracking
     public ArrayList<Simulator> bestSimulators = new ArrayList<>();
@@ -31,7 +35,7 @@ public class AIOptimizerV3 { //weighted random shit - Features: heat based accep
     }
 
     public void highHeatOptimization(){
-        System.out.println("starting");
+        // System.out.println("starting");
         int currentScoreMoney = 200;
         int currentBestScore = 0;
         int restartThreshold = 0;
@@ -77,16 +81,16 @@ public class AIOptimizerV3 { //weighted random shit - Features: heat based accep
 
             int distancePenalty = 0;
             for (Cat cat : simulator.getCats()){
-                distancePenalty += 500 * (6 - cat.getX());
+                distancePenalty += distancePenaltyMod * (6 - cat.getX());
                 if (cat.getColor() == CatColor.BLUE)
-                    distancePenalty += 500 * Math.abs(1 - cat.getY());
+                    distancePenalty += distancePenaltyMod * Math.abs(1 - cat.getY());
                 if (cat.getColor() == CatColor.RED)
-                    distancePenalty += 500 * Math.abs(2 - cat.getY());
+                    distancePenalty += distancePenaltyMod * Math.abs(2 - cat.getY());
                 if (cat.getColor() == CatColor.GREEN)
-                    distancePenalty += 500 * Math.abs(3 - cat.getY());
+                    distancePenalty += distancePenaltyMod * Math.abs(3 - cat.getY());
             }
             // distancePenalty = 0; // disable distance penalty for now
-            int score = simulator.getAIScore() - distancePenalty + simulator.getCatsFinished() * 2000;
+            int score = simulator.getAIScore() - distancePenalty + simulator.getCatsFinished() * catsFinishedPenaltyMod;
             if (score > currentBestScore || ((Math.random() < Math.pow(Math.E, (score - currentBestScore)/heat)))) {
                 if (score > currentBestScore)
                     restartThreshold = 0;
@@ -99,7 +103,7 @@ public class AIOptimizerV3 { //weighted random shit - Features: heat based accep
             restartThreshold += 1;
             currentRunAttempts += 1;
             attempts += 1;
-            heat *= (zoneInAttempts-attempts)/ (double) zoneInAttempts;
+            heat *= (zoneInAttempts-attempts)/ (double) zoneInAttempts;  // HEAT COOL DOWN FORMULA // 
         }
         if (bestSimulators.size() == 0){
             bestSimulators.add(currentSimulator);
