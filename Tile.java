@@ -43,7 +43,9 @@ public class Tile {
                 } else if (simulator.getCatsFinished() == 1){
                     cat.increasePower(cat.getPower()*2);
                 } else{
+                    System.out.println("Third Cat Finished!");
                     cat.increasePower(cat.getPower()*4);
+                    throw new RuntimeException("Third Cat Finished!");
                 }
                 simulator.increaseCatsFinished();
             }else{
